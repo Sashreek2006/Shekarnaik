@@ -1,18 +1,23 @@
 import re
-import os
 from google.colab import files
+import os
 uploaded = files.upload()
-overall_total_sum = 0
-for filename in uploaded.keys():
-  print(f'Processing file "{filename}"')
+filename = list(uploaded.keys())[0]
+print(f'User uploaded file "{filename}"')
+file_content = uploaded[filename].decode('utf-8')
+_numbers_iterator = iter(re.findall(r'\d+', file_content))
+
+def getNextNumber():
   try:
-    content = uploaded[filename].decode('utf-8')
-    numbers = re.findall(r'\d+', content)
-    file_sum = sum(int(number) for number in numbers)
-    print(f"The sum of all numbers in '{filename}' is: {file_sum}")
-    overall_total_sum += file_sum
+    return int(next(_numbers_iterator))
+  except StopIteration:
+    return None
 
-  except Exception as e:
-    print(f"Error processing file {filename}: {e}")
+total_sum = 0
+while True:
+  number = getNextNumber()
+  if number is None:
+    break
+  total_sum += number
 
-print(f"\nOverall sum of numbers across all files: {overall_total_sum}")
+print(f"The sum of all numbers in the file is: {total_sum}")
